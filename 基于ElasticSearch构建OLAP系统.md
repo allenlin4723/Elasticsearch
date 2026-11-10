@@ -1,5 +1,3 @@
-
-
 # 基于ElasticSearch构建OLAP系统
 
 ## OLAP
@@ -37,7 +35,7 @@ OLAP的基本多维分析操作有钻取（Drill-up和Drill-down）、切片（S
 
 这里举几个例子：
 
-![ghnqkgggny](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/2.png)
+![ghnqkgggny](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/2.jpeg)
 
 #### 微服务架构下的跨库查询方案
 
