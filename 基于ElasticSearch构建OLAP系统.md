@@ -1,26 +1,22 @@
-[toc]
+
+
 # 基于ElasticSearch构建OLAP系统
 
 ## OLAP
 
 ### 概述
+
 当今的数据处理大致可以分成两大类：联机事务处理OLTP、联机分析处理OLAP。OLTP是传统的关系型数据库的主要应用，主要是基本的、日常的事务处理，例如银行交易。OLAP是数据仓库系统的主要应用，支持复杂的分析操作，侧重决策支持，并且提供直观易懂的查询结果。
 
 ### 典型操作
 
 OLAP的基本多维分析操作有钻取（Drill-up和Drill-down）、切片（Slice）和切块（Dice）、以及旋转（Pivot）等。
 
-
-
-
-
-
 #### 向上钻取
 
 向上钻取是在某一维上将低层次的细节数据概括到高层次的汇总数据，或者减少维数，
 
-![原型立方体](https://note.youdao.com/yws/res/33618/5C9CFEC2A5004EC8A68D45B40022BE91)
-
+![原型立方体](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/1.png)
 
 #### 向下钻取
 
@@ -29,7 +25,6 @@ OLAP的基本多维分析操作有钻取（Drill-up和Drill-down）、切片（S
 #### 切片和切块
 
 切片和切块是在一部分维上选定值后，关心度量数据在剩余维上的分布。如果剩余的维只有两个，则是切片；如果有三个，则是切块
-
 
 #### 旋转
 
@@ -42,7 +37,7 @@ OLAP的基本多维分析操作有钻取（Drill-up和Drill-down）、切片（S
 
 这里举几个例子：
 
-![ghnqkgggny](https://note.youdao.com/yws/res/33646/F04E0284D4114AB3858A4FA9CD1CD09F)
+![ghnqkgggny](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/2.png)
 
 #### 微服务架构下的跨库查询方案
 
@@ -56,12 +51,11 @@ OLAP的基本多维分析操作有钻取（Drill-up和Drill-down）、切片（S
 
 聚合服务的数据组装是以API接口调用来实现。以我们的listing工作台为例，如果基于现有的spring cloud服务，要重新实现listing工作台，那么需要进行如下的api调用才行：
 
-![服务依赖](https://note.youdao.com/yws/res/33666/61F06F4FD4764DCE8FED340F9D8F07CC)
+![服务依赖](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/3.png)
 
 ##### 3、表视图查询
 
 需要具体以下前提条件：
-
 
 ```
 1. 数据库需要部署在同一台服务器上
@@ -72,16 +66,15 @@ OLAP的基本多维分析操作有钻取（Drill-up和Drill-down）、切片（S
 
 目前我们的销售系统，FBA库存数据就是采用这种方式
 
-![image](https://note.youdao.com/yws/res/33675/3660F06379374D408022569B36022E96)
+![image](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/4.png)
 
-![image](https://note.youdao.com/yws/res/33677/BC45A41BBE434A12B3F55F6F92A9FAD8)
+![image](https://note.youdao.com/yws/res/33677/https://github.com/allenlin4723/Elasticsearch/blob/main/pic/5.png)
 
 在销售系统的主数据库amazon_sale创建视图，跨库mws_sundix查询FBA库存。
 
 ##### 4、多数据源查询
 
 这种方式是一种比较老的技术思路，简单来说就是一个服务配置多个数据库源（DataSource），进行数据源来回切换进行库表查询，以达到获取不同数据的目的。
-
 
 ##### 5、使用数据库中间件--Mycat
 
@@ -93,39 +86,33 @@ Mycat关键特性
 
 从mycat特性来说，其天生就支持分库分表以及跨库查询，具体不多说，有兴趣的同学，可以去[官网](http://www.mycat.org.cn/)了解mycat的原理
 
-
-
 以上几种方式都能实现跨库查询，但是难以避免的都是会存在一些不足，而且这些方案只是解决了跨库查询的问题，如果系统还需要一些数据分析功能的话，特别是某个关联表的数据量非常大的情况下，那么join操作将会给系统性能带来致命的一击。
-
 
 再回过头来看OLAP，确定数据模型，通过多渠道的数据采集，然后进行ETL，汇总各类数据，最后对外提供数据查询API，这样对开发/分析人员来说，只需要面对一种统一的API，不需要直接面对多种类型的业务数据模型；
 
 ### 为何选择Elasticsearch？
 
 Elasticsearch不仅仅只是一个全文搜索引擎。 它可以被下面这样准确的形容：
- * ES文档通过JSON格式来表示。文档是可以被索引的基本单元，文档需要索引需要指定类型。ES能支持索引的数据类型有，其中的数组类型，对象类型和内嵌类型的支持，使得ES能存储更复杂的文档
- * 一个分布式的实时文档存储，每个字段可以被索引与搜索
- * 一个分布式实时分析搜索引擎
- * 它提供的聚合功能可以实现OLAP的各种操作
- * 能胜任上百个服务节点的扩展，并支持PB级别的结构化或者非结构化数据。
- * 结合logstash和kibana可以快速进行一些简单报表的呈现
- * Elasticsearch将所有的功能打包成一个单独的服务，这样可以通过程序去访问它提供的简单的RESTful API服务 
- 
+
+* ES文档通过JSON格式来表示。文档是可以被索引的基本单元，文档需要索引需要指定类型。ES能支持索引的数据类型有，其中的数组类型，对象类型和内嵌类型的支持，使得ES能存储更复杂的文档
+* 一个分布式的实时文档存储，每个字段可以被索引与搜索
+* 一个分布式实时分析搜索引擎
+* 它提供的聚合功能可以实现OLAP的各种操作
+* 能胜任上百个服务节点的扩展，并支持PB级别的结构化或者非结构化数据。
+* 结合logstash和kibana可以快速进行一些简单报表的呈现
+* Elasticsearch将所有的功能打包成一个单独的服务，这样可以通过程序去访问它提供的简单的RESTful API服务
+
 除了Elasticsearch，还可以实现OLAP的，还有Druid、Clickhouse、Pinot、Kylin、Prest等开源组件。刚兴趣的同学可以去了解下各自的优缺点和使用场景。
 
 ## 方案
 
-
-![OLAP实现方案](https://note.youdao.com/yws/res/33743/FBB252857E134E3DBBE6630E9ED6E0AA)
-
+![OLAP实现方案](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/6.png)
 
 ### 基于logstash全量同步mws的Orderitem
 
 1. 在logstash的conf目录下创建一个mws-orderitem-es.conf配置文件，具体配置内容如下：
 
-
 ```
-
 input {
     jdbc {
       # mysql 数据库链接
@@ -182,19 +169,15 @@ output {
         codec => rubydebug
     }
 }
-
 ```
-
 
 2. 启动logstash开始全量同步mws的order-item数据：
 
 ```
 nohup bin/logstash -f config/mws-orderitem-es.conf --path.data=/udisk/logstash/orderitem-es/ < /dev/null 2>&1 &
-
 ```
 
 logstahs执行日志：
-
 
 ```
 [2020-12-21T16:16:24,384][INFO ][logstash.inputs.jdbc     ][main][a3d17e55f47bfad970157cb4fa51863ca30b4d53426565a7e0396242cb140809] (2.792850s) SELECT * FROM (		select
@@ -239,7 +222,6 @@ logstahs执行日志：
 		t.INST_DATE instDate
                 FROM O_ORDER_ITEM t
 ) AS `t1` LIMIT 50000 OFFSET 0
-
 ```
 
 上面的执行sql是没有设置offset，这样执行有两个不好的地方：
@@ -248,7 +230,6 @@ logstahs执行日志：
 > 2. 因为没有排序，对于一个高写入的表来说，最终全量同步到es的表数据，会漏掉很多，（实际测试结果，几十万条记录）
 
 针对以上问题，进行优化。
-
 
 对config/mws-orderitem-es.conf进行修改如下：
 
@@ -273,10 +254,9 @@ logstahs执行日志：
 
 在表O_ORDER_ITEM增加字段version，设置为自增主键
 
-![image](https://note.youdao.com/yws/res/33817/0A63FCC704BD4D708DB4221CB30437CC)
+![image](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/7.png)
 
 修改同步的sql：
-
 
 ```
 		select
@@ -322,24 +302,21 @@ logstahs执行日志：
 	    t.VERSION version
         FROM O_ORDER_ITEM t
         WHERE t.VERSION  BETWEEN :sql_last_value AND (:sql_last_value+50000)
-
 ```
 
 其中`:sql_last_value` 就是上一次执行的offset值
 
 3. 在kibana的数据展示，如下：
 
-![image](https://note.youdao.com/yws/res/33839/C2BF044FDB5C44FF84218DAB9F31BAA6)
-
+![image](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/8.png)
 
 ### 基于canal增量同步mws的Orderitem
-
 
 #### Canal工作原理
 
 原理相对比较简单：
 
-![image](https://note.youdao.com/yws/res/33852/CC3B26BDA5AB40168F242C4DD0B8D03C)
+![image](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/9.png)
 
 > 1. canal模拟mysql slave与mysql master的交互协议，伪装自己是一个mysql slave，向mysql master发送dump协议；
 > 2. mysql master收到mysql slave（canal）发送的dump请求，开始推送binlog增量日志给slave(也就是canal)；
@@ -351,23 +328,21 @@ logstahs执行日志：
 
  源数据库开启了binary log 并且format为ROW
 
-
 ```
 log_bin=/udisk/mysql-5.7.28/mysql_binary_log
 binlog_format = ROW
 server_id=1
 ```
+
 **2. 配置instance**
 
 在canal-deployer-1.1.4/config目录下创建toplus-mws-canal目录：
-
 
 ```
 mkdri toplus-mws-canal 
 ```
 
 将config/example目录下的instance.properties文件复制到上面创建的目录，并修改：
-
 
 ```
 # 源数据库地址
@@ -384,12 +359,9 @@ canal.instance.filter.regex=.*\\..*
 
 # 消息topic的配置，这里可以采用当前系统已有的mq，例如Kafka，RocketMQ等
 canal.mq.topic=toplus-mws-canal
-
-
 ```
 
 配置config/canal.properties
-
 
 ```
 # canal目标名称
@@ -400,22 +372,19 @@ canal.conf.dir = ../conf
 
 启动canal server
 
-
 ```
 sh bin/startup.sh
 ```
 
 启动后，可以在config/toplus-mws-canal目录下，看到自动生成如下两个文件好`h2.mv.db`和`meta.dat`：
 
-![image](https://note.youdao.com/yws/res/33891/499AEEBC05494DAFA7BBDC337BCB03BD)
+![image](https://github.com/allenlin4723/Elasticsearch/blob/main/pic/10.png)
 
 这两个文件的作用，就是保存了从源数据库的binary log读取过来的数据库修改记录，如果删除这两个文件，重新启动canal，则表示从当前的binary log开始同步，过往数据丢弃不再处理
-
 
 **3. 自定义canal client**
 
 为什么要采用自定义的client？
-
 
 ```
 1. 我们需要对源数据进行清洗过滤
@@ -423,7 +392,6 @@ sh bin/startup.sh
 ```
 
 引入依赖包：
-
 
 ```
         <dependency>
@@ -482,7 +450,6 @@ public class CanalClient   implements DisposableBean {
 ```
 
 定时从canal server拉去消息--间隔1s，拉取一次
-
 
 ```
 @Slf4j
@@ -580,11 +547,9 @@ public class CanalScheduleTask {
 
         });
     }
-
 ```
 
 以OrderItemIndex为例：
-
 
 ```
     @Override
@@ -626,7 +591,6 @@ public class CanalScheduleTask {
 ```
 
 ### Elasticsearch聚合Api的简单示例
-
 
 ```
     /**
@@ -731,6 +695,4 @@ public class CanalScheduleTask {
         }
         return  resultMap;
     }
-
 ```
-
